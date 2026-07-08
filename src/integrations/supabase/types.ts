@@ -14,7 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      leads: {
+        Row: {
+          cidade: string
+          created_at: string
+          documentos: Json
+          email: string
+          id: string
+          nome: string
+          submission_id: string
+          telefone: string
+        }
+        Insert: {
+          cidade: string
+          created_at?: string
+          documentos?: Json
+          email: string
+          id?: string
+          nome: string
+          submission_id?: string
+          telefone: string
+        }
+        Update: {
+          cidade?: string
+          created_at?: string
+          documentos?: Json
+          email?: string
+          id?: string
+          nome?: string
+          submission_id?: string
+          telefone?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
