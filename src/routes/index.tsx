@@ -105,6 +105,9 @@ function Index() {
       <footer className="border-t border-border bg-card">
         <div className="mx-auto max-w-6xl px-5 py-6 text-center text-xs text-muted-foreground">
           © {new Date().getFullYear()}&nbsp;Felipe Alves — Tornando seu sonho possível. Seus dados estão seguros conosco.
+          <Link to="/auth" className="ml-2 underline-offset-2 hover:underline">
+            Acesso da equipe
+          </Link>
         </div>
       </footer>
     </main>
