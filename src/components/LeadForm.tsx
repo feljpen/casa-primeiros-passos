@@ -62,6 +62,10 @@ export function LeadForm() {
       toast.error("Anexe pelo menos um documento para prosseguir.");
       return;
     }
+    if (!consentimento) {
+      toast.error("Você precisa aceitar os termos de privacidade (LGPD) para enviar.");
+      return;
+    }
     setEnviando(true);
     try {
       const submissionId = crypto.randomUUID();
