@@ -1,12 +1,26 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
-import { LogOut, Loader as Loader2, Download, FileText, Phone, Mail, MapPin, Users, Trash2, RefreshCw, FileSpreadsheet } from "lucide-react";
+import {
+  LogOut,
+  Loader2,
+  Download,
+  FileText,
+  Phone,
+  Mail,
+  MapPin,
+  Users,
+  Trash2,
+  RefreshCw,
+  FileSpreadsheet,
+} from "lucide-react";
 
-import { supabase } from "@/integrations/supabase/client";
-import { listarLeads, excluirLead, type LeadAdmin } from "@/lib/admin.functions";
+import {
+  listarLeads,
+  excluirLead as excluirLeadStore,
+  sair as sairStore,
+  type Lead,
+} from "@/lib/leads-store";
 import { CATEGORIAS_DOCUMENTOS } from "@/lib/documentos";
 import { Button } from "@/components/ui/button";
 
@@ -34,7 +48,7 @@ function escaparCsv(valor: string): string {
   return precisaAspas ? `"${limpo}"` : limpo;
 }
 
-function exportarCsv(leads: LeadAdmin[]) {
+function exportarCsv(leads: Lead[]) {
   const cabecalho = ["Nome", "Telefone", "E-mail", "Cidade", "Documentos", "Recebido em"];
   const linhas = leads.map((lead) => {
     const totalDocs = lead.documentos.reduce((acc, g) => acc + g.arquivos.length, 0);
@@ -61,32 +75,28 @@ function exportarCsv(leads: LeadAdmin[]) {
 
 function AdminPage() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const fetchLeads = useServerFn(listarLeads);
-  const removeLead = useServerFn(excluirLead);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [carregando, setCarregando] = useState(true);
 
-  const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
-    queryKey: ["admin", "leads"],
-    queryFn: () => fetchLeads(),
-  });
+  const carregar = useCallback(() => {
+    setLeads(listarLeads());
+    setCarregando(false);
+  }, []);
 
-  const excluir = useMutation({
-    mutationFn: (id: string) => removeLead({ data: { id } }),
-    onSuccess: () => {
-      toast.success("Lead excluído.");
-      queryClient.invalidateQueries({ queryKey: ["admin", "leads"] });
-    },
-    onError: () => toast.error("Não foi possível excluir."),
-  });
+  useEffect(() => {
+    carregar();
+  }, [carregar]);
 
-  const sair = async () => {
-    await queryClient.cancelQueries();
-    queryClient.clear();
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
+  const excluir = (id: string) => {
+    excluirLeadStore(id);
+    setLeads(listarLeads());
+    toast.success("Lead excluído.");
   };
 
-  const leads = data ?? [];
+  const sair = () => {
+    sairStore();
+    navigate({ to: "/auth", replace: true });
+  };
 
   return (
     <main className="min-h-screen bg-background">
@@ -111,8 +121,8 @@ function AdminPage() {
               <FileSpreadsheet className="h-4 w-4" />
               <span className="hidden sm:inline">Exportar CSV</span>
             </Button>
-            <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
-              <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
+            <Button variant="outline" size="sm" onClick={carregar}>
+              <RefreshCw className="h-4 w-4" />
               <span className="hidden sm:inline">Atualizar</span>
             </Button>
             <Button variant="ghost" size="sm" onClick={sair}>
@@ -124,15 +134,9 @@ function AdminPage() {
       </header>
 
       <div className="mx-auto max-w-5xl px-5 py-8">
-        {isLoading ? (
+        {carregando ? (
           <div className="flex items-center justify-center py-20 text-muted-foreground">
             <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Carregando leads...
-          </div>
-        ) : isError ? (
-          <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-center text-sm text-destructive">
-            {error instanceof Error && error.message.includes("administradores")
-              ? "Sua conta não tem permissão de administrador."
-              : "Não foi possível carregar os leads. Tente atualizar."}
           </div>
         ) : leads.length === 0 ? (
           <div className="rounded-xl border border-border bg-card p-10 text-center">
@@ -148,7 +152,7 @@ function AdminPage() {
             </p>
             <div className="space-y-4">
               {leads.map((lead) => (
-                <LeadCard key={lead.id} lead={lead} onExcluir={() => excluir.mutate(lead.id)} />
+                <LeadCard key={lead.id} lead={lead} onExcluir={() => excluir(lead.id)} />
               ))}
             </div>
           </>
@@ -158,7 +162,7 @@ function AdminPage() {
   );
 }
 
-function LeadCard({ lead, onExcluir }: { lead: LeadAdmin; onExcluir: () => void }) {
+function LeadCard({ lead, onExcluir }: { lead: Lead; onExcluir: () => void }) {
   const [confirmar, setConfirmar] = useState(false);
   const totalArquivos = lead.documentos.reduce((acc, g) => acc + g.arquivos.length, 0);
 
@@ -201,26 +205,16 @@ function LeadCard({ lead, onExcluir }: { lead: LeadAdmin; onExcluir: () => void 
                   {TITULOS[grupo.categoria] ?? grupo.categoria}
                 </p>
                 <div className="mt-1.5 flex flex-wrap gap-2">
-                  {grupo.arquivos.map((arq, i) =>
-                    arq.url ? (
-                      <a
-                        key={arq.path}
-                        href={arq.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-secondary/50 px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-secondary"
-                      >
-                        <Download className="h-3.5 w-3.5" /> Arquivo {i + 1}
-                      </a>
-                    ) : (
-                      <span
-                        key={arq.path}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground"
-                      >
-                        Arquivo indisponível
-                      </span>
-                    ),
-                  )}
+                  {grupo.arquivos.map((arq, i) => (
+                    <a
+                      key={`${arq.nome}-${i}`}
+                      href={arq.dataUrl}
+                      download={arq.nome}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-secondary/50 px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-secondary"
+                    >
+                      <Download className="h-3.5 w-3.5" /> {arq.nome || `Arquivo ${i + 1}`}
+                    </a>
+                  ))}
                 </div>
               </div>
             ))}

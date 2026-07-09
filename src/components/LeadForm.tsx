@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { ArrowRight, ArrowLeft, Loader2, ShieldCheck, PartyPopper } from "lucide-react";
+import { ArrowRight, ArrowLeft, Loader as Loader2, ShieldCheck, PartyPopper } from "lucide-react";
 
-import { supabase } from "@/integrations/supabase/client";
+import { salvarLead, type LeadDocumentoGrupo } from "@/lib/leads-store";
 import { CATEGORIAS_DOCUMENTOS } from "@/lib/documentos";
 import { DocumentUploadCard } from "@/components/DocumentUploadCard";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,15 @@ const CAMPOS: { name: keyof Dados; label: string; placeholder: string; type: str
   { name: "email", label: "E-mail", placeholder: "seu@email.com", type: "email" },
   { name: "cidade", label: "Cidade", placeholder: "Onde você quer morar", type: "text" },
 ];
+
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
 
 export function LeadForm() {
   const [etapa, setEtapa] = useState<1 | 2>(1);
@@ -68,36 +77,26 @@ export function LeadForm() {
     }
     setEnviando(true);
     try {
-      const submissionId = crypto.randomUUID();
-      const documentos: { categoria: string; arquivos: string[] }[] = [];
+      const documentos: LeadDocumentoGrupo[] = [];
 
       for (const categoria of CATEGORIAS_DOCUMENTOS) {
         const lista = arquivos[categoria.id] ?? [];
         if (lista.length === 0) continue;
-        const paths: string[] = [];
-        for (let i = 0; i < lista.length; i++) {
-          const file = lista[i];
-          const ext = file.name.split(".").pop() ?? "dat";
-          const path = `${submissionId}/${categoria.id}/${i}-${Date.now()}.${ext}`;
-          const { error } = await supabase.storage.from("documentos").upload(path, file, {
-            cacheControl: "3600",
-            upsert: false,
-          });
-          if (error) throw error;
-          paths.push(path);
+        const arquivosConvertidos: { nome: string; dataUrl: string }[] = [];
+        for (const file of lista) {
+          const dataUrl = await fileToDataUrl(file);
+          arquivosConvertidos.push({ nome: file.name, dataUrl });
         }
-        documentos.push({ categoria: categoria.id, arquivos: paths });
+        documentos.push({ categoria: categoria.id, arquivos: arquivosConvertidos });
       }
 
-      const { error: insertError } = await supabase.from("leads").insert({
-        submission_id: submissionId,
+      salvarLead({
         nome: dados.nome.trim(),
         telefone: dados.telefone.trim(),
         email: dados.email.trim(),
         cidade: dados.cidade.trim(),
         documentos,
       });
-      if (insertError) throw insertError;
 
       setConcluido(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
