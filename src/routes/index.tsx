@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2, Clock, KeyRound, HandCoins } from "lucide-react";
 
 import heroFamilia from "@/assets/hero-familia.jpg";
