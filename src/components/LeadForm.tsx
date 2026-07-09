@@ -38,6 +38,7 @@ export function LeadForm() {
   const [arquivos, setArquivos] = useState<Record<string, File[]>>({});
   const [enviando, setEnviando] = useState(false);
   const [concluido, setConcluido] = useState(false);
+  const [consentimento, setConsentimento] = useState(false);
 
   const totalArquivos = Object.values(arquivos).reduce((acc, list) => acc + list.length, 0);
 
