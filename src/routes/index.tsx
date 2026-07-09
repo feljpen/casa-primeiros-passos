@@ -7,13 +7,13 @@ import { LeadForm } from "@/components/LeadForm";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Minha Casa Minha Vida | DS Imóveis — Realize o sonho da casa própria" },
+      { title: "Minha Casa Minha Vida | Felipe Alves Corretagem — Realize o sonho da casa própria" },
       {
         name: "description",
         content:
-          "Faixa 1 do Minha Casa Minha Vida: envie seus documentos e agilize sua aprovação com a DS Imóveis. Atendimento gratuito e sem burocracia.",
+          "Faixa 1 do Minha Casa Minha Vida: envie seus documentos e agilize sua aprovação com Felipe Alves Corretagem. Atendimento gratuito e sem burocracia.",
       },
-      { property: "og:title", content: "Minha Casa Minha Vida | DS Imóveis" },
+      { property: "og:title", content: "Minha Casa Minha Vida | Felipe Alves Corretagem" },
       {
         property: "og:description",
         content: "Envie seus documentos e dê o primeiro passo rumo à casa própria. Rápido, gratuito e sem burocracia.",
@@ -42,9 +42,9 @@ function Index() {
             <KeyRound className="h-5 w-5" />
           </span>
           <div className="leading-none">
-            <p className="text-base font-extrabold tracking-tight text-foreground">DS IMÓVEIS</p>
+            <p className="text-base font-extrabold tracking-tight text-foreground">Felipe Alves Corretagem</p>
             <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
-              Tornando seu sonho possível
+              TRANSFORMO IMÓVEIS EM LARES
             </p>
           </div>
         </div>
@@ -54,7 +54,7 @@ function Index() {
         {/* Copy persuasiva */}
         <section className="lg:sticky lg:top-8">
           <span className="inline-flex items-center rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">
-            Programa Minha Casa Minha Vida • Faixa 1
+            Programa Minha Casa Minha Vida{" "}
           </span>
 
           <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-5xl">
@@ -104,7 +104,7 @@ function Index() {
 
       <footer className="border-t border-border bg-card">
         <div className="mx-auto max-w-6xl px-5 py-6 text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} DS Imóveis — Tornando seu sonho possível. Seus dados estão seguros conosco.
+          © {new Date().getFullYear()}&nbsp;Felipe Alves — Tornando seu sonho possível. Seus dados estão seguros conosco.
         </div>
       </footer>
     </main>
