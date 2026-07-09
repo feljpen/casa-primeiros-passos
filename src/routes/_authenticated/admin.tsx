@@ -3,18 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import {
-  LogOut,
-  Loader2,
-  Download,
-  FileText,
-  Phone,
-  Mail,
-  MapPin,
-  Users,
-  Trash2,
-  RefreshCw,
-} from "lucide-react";
+import { LogOut, Loader as Loader2, Download, FileText, Phone, Mail, MapPin, Users, Trash2, RefreshCw, FileSpreadsheet } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { listarLeads, excluirLead, type LeadAdmin } from "@/lib/admin.functions";
@@ -37,6 +26,37 @@ function formatarData(iso: string) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function escaparCsv(valor: string): string {
+  const precisaAspas = /[",;\n\r]/.test(valor);
+  const limpo = valor.replace(/"/g, '""');
+  return precisaAspas ? `"${limpo}"` : limpo;
+}
+
+function exportarCsv(leads: LeadAdmin[]) {
+  const cabecalho = ["Nome", "Telefone", "E-mail", "Cidade", "Documentos", "Recebido em"];
+  const linhas = leads.map((lead) => {
+    const totalDocs = lead.documentos.reduce((acc, g) => acc + g.arquivos.length, 0);
+    return [
+      escaparCsv(lead.nome),
+      escaparCsv(lead.telefone),
+      escaparCsv(lead.email),
+      escaparCsv(lead.cidade),
+      String(totalDocs),
+      escaparCsv(formatarData(lead.created_at)),
+    ].join(";");
+  });
+  const csv = [cabecalho.join(";"), ...linhas].join("\r\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `leads-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
 
 function AdminPage() {
@@ -82,6 +102,15 @@ function AdminPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => exportarCsv(leads)}
+              disabled={leads.length === 0}
+            >
+              <FileSpreadsheet className="h-4 w-4" />
+              <span className="hidden sm:inline">Exportar CSV</span>
+            </Button>
             <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
               <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
               <span className="hidden sm:inline">Atualizar</span>
