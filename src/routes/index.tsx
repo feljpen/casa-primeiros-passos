@@ -11,12 +11,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Faixa 1 do Minha Casa Minha Vida: envie seus documentos e agilize sua aprovação com Felipe Alves Corretagem. Atendimento gratuito e sem burocracia.",
+          "Minha Casa Minha Vida: envie seus documentos e agilize sua aprovação com Felipe Alves Corretagem. Atendimento gratuito e sem burocracia.",
       },
-      { property: "og:title", content: "Minha Casa Minha Vida | Felipe Alves Corretagem" },
+      { property: "og:title", content: "Minha Casa Minha Vida | Felipe Alves Corretagem — Realize o sonho da casa própria" },
       {
         property: "og:description",
-        content: "Envie seus documentos e dê o primeiro passo rumo à casa própria. Rápido, gratuito e sem burocracia.",
+        content: "Minha Casa Minha Vida: envie seus documentos e agilize sua aprovação com Felipe Alves Corretagem. Atendimento gratuito e sem burocracia.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

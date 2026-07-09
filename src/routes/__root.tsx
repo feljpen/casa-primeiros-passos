@@ -78,13 +78,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Minha Casa Minha Vida | DS Imóveis" },
-      { name: "description", content: "Realize o sonho da casa própria com a DS Imóveis. Envie seus documentos e agilize sua aprovação no Minha Casa Minha Vida." },
+      { title: "Minha Casa Minha Vida | Felipe Alves Corretagem — Realize o sonho da casa própria" },
+      { name: "description", content: "Minha Casa Minha Vida: envie seus documentos e agilize sua aprovação com Felipe Alves Corretagem. Atendimento gratuito e sem burocracia." },
       { name: "author", content: "DS Imóveis" },
-      { property: "og:title", content: "Minha Casa Minha Vida | DS Imóveis" },
-      { property: "og:description", content: "Realize o sonho da casa própria com a DS Imóveis. Rápido, gratuito e sem burocracia." },
+      { property: "og:title", content: "Minha Casa Minha Vida | Felipe Alves Corretagem — Realize o sonho da casa própria" },
+      { property: "og:description", content: "Minha Casa Minha Vida: envie seus documentos e agilize sua aprovação com Felipe Alves Corretagem. Atendimento gratuito e sem burocracia." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Minha Casa Minha Vida | Felipe Alves Corretagem — Realize o sonho da casa própria" },
+      { name: "twitter:description", content: "Minha Casa Minha Vida: envie seus documentos e agilize sua aprovação com Felipe Alves Corretagem. Atendimento gratuito e sem burocracia." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/545845ca-122c-4b1f-b6c7-8edaff4b4d66" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/545845ca-122c-4b1f-b6c7-8edaff4b4d66" },
     ],
     links: [
       {
