@@ -9,6 +9,7 @@ import { DocumentUploadCard } from "@/components/DocumentUploadCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const dadosSchema = z.object({
   nome: z.string().trim().min(2, "Informe seu nome completo").max(120),
@@ -37,6 +38,7 @@ export function LeadForm() {
   const [arquivos, setArquivos] = useState<Record<string, File[]>>({});
   const [enviando, setEnviando] = useState(false);
   const [concluido, setConcluido] = useState(false);
+  const [consentimento, setConsentimento] = useState(false);
 
   const totalArquivos = Object.values(arquivos).reduce((acc, list) => acc + list.length, 0);
 
@@ -58,6 +60,10 @@ export function LeadForm() {
   const enviar = async () => {
     if (totalArquivos === 0) {
       toast.error("Anexe pelo menos um documento para prosseguir.");
+      return;
+    }
+    if (!consentimento) {
+      toast.error("Você precisa aceitar os termos de privacidade (LGPD) para enviar.");
       return;
     }
     setEnviando(true);
@@ -204,6 +210,20 @@ export function LeadForm() {
             ))}
           </div>
 
+          <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-secondary/40 p-4">
+            <Checkbox
+              checked={consentimento}
+              onCheckedChange={(v) => setConsentimento(v === true)}
+              className="mt-0.5"
+            />
+            <span className="text-xs leading-relaxed text-muted-foreground">
+              Li e concordo com o tratamento dos meus dados pessoais e documentos de acordo com a
+              <strong className="text-foreground"> Lei Geral de Proteção de Dados (LGPD)</strong> e a
+              Política de Privacidade. Autorizo o uso das informações exclusivamente para análise do meu
+              cadastro no programa Minha Casa Minha Vida e contato pela equipe.
+            </span>
+          </label>
+
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Button
               variant="outline"
@@ -217,7 +237,7 @@ export function LeadForm() {
             <Button
               onClick={enviar}
               size="lg"
-              disabled={enviando}
+              disabled={enviando || !consentimento}
               className="flex-1 text-base font-semibold"
             >
               {enviando ? (
