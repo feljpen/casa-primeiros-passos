@@ -210,6 +210,20 @@ export function LeadForm() {
             ))}
           </div>
 
+          <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-secondary/40 p-4">
+            <Checkbox
+              checked={consentimento}
+              onCheckedChange={(v) => setConsentimento(v === true)}
+              className="mt-0.5"
+            />
+            <span className="text-xs leading-relaxed text-muted-foreground">
+              Li e concordo com o tratamento dos meus dados pessoais e documentos de acordo com a
+              <strong className="text-foreground"> Lei Geral de Proteção de Dados (LGPD)</strong> e a
+              Política de Privacidade. Autorizo o uso das informações exclusivamente para análise do meu
+              cadastro no programa Minha Casa Minha Vida e contato pela equipe.
+            </span>
+          </label>
+
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Button
               variant="outline"
@@ -223,7 +237,7 @@ export function LeadForm() {
             <Button
               onClick={enviar}
               size="lg"
-              disabled={enviando}
+              disabled={enviando || !consentimento}
               className="flex-1 text-base font-semibold"
             >
               {enviando ? (
